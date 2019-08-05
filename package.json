@@ -1,0 +1,62 @@
+{
+  "name": "26thficommunitychatbot",
+  "version": "0.0.1",
+  "description": "Community Chat Bot",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc --build tsconfig.json",
+    "generate-docs": "typedoc --out assets/docs src",
+    "lint": "tslint --project tsconfig.json -c tslint.json 'src/**/*.ts'",
+    "test": "mocha --require ts-node/register test/**/*.test.ts --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morkohl/26thFICommunityChatBot.git"
+  },
+  "author": "morkohl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/morkohl/26thFICommunityChatBot/issues"
+  },
+  "homepage": "https://github.com/morkohl/26thFICommunityChatBot#readme",
+  "dependencies": {
+    "app-root-path": "^2.2.1",
+    "dotenv": "^7.0.0",
+    "pg": "^7.11.0",
+    "sequelize": "^5.8.7",
+    "prom-client": "^11.5.3"
+  },
+  "devDependencies": {
+    "@types/app-root-path": "^1.2.4",
+    "@types/chai": "^4.1.7",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.16.1",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^12.0.4",
+    "@types/socket.io": "^2.1.2",
+    "@yamdbf/core": "^3.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "nodemon": "^1.18.10",
+    "nyc": "^14.1.1",
+    "sequelize-typescript": "^0.6.11",
+    "sqlite3": "^4.0.8",
+    "ts-mockito": "^2.3.1",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.3.3333"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*"
+    ],
+    "reporter": [
+      "lcov"
+    ],
+    "all": true
+  }
+}
