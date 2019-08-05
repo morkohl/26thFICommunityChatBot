@@ -1,0 +1,19 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "max-line-length": {
+            "options": [ 160 ]
+        },
+        "semicolon": {
+            "severity": "warning"
+        },
+        "await-promise": {
+            "severity": "warning"
+        }
+    },
+    "rulesDirectory": []
+}
