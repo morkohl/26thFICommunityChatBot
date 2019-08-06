@@ -1,24 +1,25 @@
 import {path} from "app-root-path";
 import {config} from "dotenv";
 
-export interface Config {
-    databaseConfig: DatabaseConfig;
+export interface IConfig {
+    databaseConfig: IDatabaseConfig;
 }
 
-export type DatabaseDialects = "pg" | "sqlite3" | string
+export type DatabaseDialect = "postgres" | "sqlite" | "mssql" | "mysql";
 
-export interface DatabaseConfig {
-    host: string;
-    port: number;
+export type DatabaseLoggingOption = () => void | boolean;
+
+export interface IDatabaseConfig {
+    host: string | undefined;
+    port: number | undefined;
     username: string;
     password: string;
     database: string;
-    dialect: DatabaseDialects;
-    storage: string;
-    logging: boolean;
+    dialect: DatabaseDialect;
+    logging: DatabaseLoggingOption;
 }
 
-export default function configure(): Config {
+export default function configure(): IConfig {
     config({path: `${path}/.env${process.env.NODE_ENV === "PROD" ? "" : ".LOCAL"}`});
 
     return {
@@ -27,10 +28,9 @@ export default function configure(): Config {
             port: parsePort(process.env.DB_PORT) || defaultConfig.databaseConfig.port,
             username: process.env.DB_USER || defaultConfig.databaseConfig.username,
             password: process.env.DB_PASSWORD || defaultConfig.databaseConfig.password,
-            dialect: process.env.DB_DIALECT || defaultConfig.databaseConfig.dialect,
-            storage: process.env.DB_STORAGE || defaultConfig.databaseConfig.storage,
+            dialect: (process.env.DB_DIALECT || defaultConfig.databaseConfig.dialect) as DatabaseDialect,
             database: process.env.DB_DATABASE || defaultConfig.databaseConfig.database,
-            logging: (process.env.DB_LOGGING || defaultConfig.databaseConfig.logging) as boolean
+            logging: (process.env.DB_LOGGING || defaultConfig.databaseConfig.logging) as DatabaseLoggingOption,
         },
     };
 }
@@ -39,15 +39,14 @@ function parsePort(environmentVariable: string | undefined): number | undefined 
     return environmentVariable !== undefined ? parseInt(environmentVariable, 10) : undefined;
 }
 
-const defaultConfig: Config = {
+const defaultConfig: IConfig = {
     databaseConfig: {
-        host: "localhost",
-        port: 3306,
-        username: "admin",
-        password: "admin",
-        dialect: "sqlite3",
-        storage: "",
+        host: undefined,
+        port: undefined,
+        username: "root",
+        password: "",
+        dialect: "sqlite",
         database: "admin",
-        logging: true
-    }
+        logging: console.log,
+    },
 };

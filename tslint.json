@@ -13,6 +13,10 @@
         "await-promise": {
             "severity": "warning"
         },
+        "no-console": {
+            "severity": "warning"
+        },
+
         //disabled checks
         "ordered-imports": false,
         "object-literal-sort-keys": false
