@@ -1,4 +1,4 @@
-import {AutoIncrement, Column, Default, ForeignKey, HasOne, PrimaryKey, Table} from "sequelize-typescript";
+import {Column, Default, ForeignKey, HasOne, Table} from "sequelize-typescript";
 import {BIGINT, NUMBER, STRING} from "sequelize";
 import Event from "./event.model";
 import BaseModel from "./model.base";
@@ -14,21 +14,18 @@ export default class Schedule extends BaseModel<Schedule> {
     @Column(NUMBER)
     public eventEnd: number;
 
-    @Column(NUMBER)
     @Default(2)
+    @Column(NUMBER)
     public numberOfNotifications: number;
 
-    @Column(STRING)
     @Default("30m")
+    @Column(STRING)
     public notificationInterval: string;
 
     @Column(STRING)
     public notificationTexts: string;
 
     @ForeignKey(() => Event)
-    @Column
+    @Column(BIGINT)
     public eventId: bigint;
-
-    @HasOne(() => Event)
-    public event: Event;
 }

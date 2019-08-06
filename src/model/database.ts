@@ -1,40 +1,37 @@
-import {DatabaseConfig} from "../config/config";
+import {IDatabaseConfig} from "../config/config";
 import {Sequelize} from "sequelize-typescript";
+import Occurence from "./occurence.model";
+import Schedule from "./schedule.model";
+import Event from "./event.model";
 
 export class Database {
     public sequelize: Sequelize;
 
-    constructor(private databaseConfig: DatabaseConfig) {
+    constructor(private databaseConfig: IDatabaseConfig) {
     }
 
-    public init(): Promise<void> {
+    public async init(): Promise<void> {
         const sequelizeConfig = this.minifyConfig();
 
         this.sequelize = new Sequelize(sequelizeConfig as any);
-        this.sequelize.addModels([__dirname + "/model/*.model.ts"]);
-        this.sequelize.addModels([__dirname + "/model/*.model.js"]);
-        return this.sequelize.connectionManager().sync();
+        this.sequelize.addModels([ Event, Schedule, Occurence ]);
+        this.sequelize.addModels([__dirname + "/**/*.model.ts"]);
+        this.sequelize.addModels([__dirname + "/**/*.model.js"]);
+
+        return await this.sequelize.sync();
     }
 
-    /**
-     * Performs a health check by querying the database.
-     * @return Returns true, if the database could be queried.
-     */
     public async healthCheck(): Promise<boolean> {
         try {
-            throw new Error("Not implemented")
+            throw new Error("Not implemented");
         } catch {
             return false;
         }
-
         return true;
     }
 
-    /**
-     * Closes the database connection
-     */
     public async close(): Promise<void> {
-        await this.sequelize.connectionManager.close();
+        return await this.sequelize.connectionManager.close();
     }
 
     private minifyConfig(): { [key: string]: any } {

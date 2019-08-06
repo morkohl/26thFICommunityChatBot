@@ -5,13 +5,13 @@ import Occurence from "./occurence.model";
 import BaseModel from "./model.base";
 
 @Table({ modelName: "events"})
-export default class Event extends BaseModel<Event>{
-    @Column(STRING)
-    @Unique(true)
-    public name: string;
-
+export default class Event extends BaseModel<Event> {
     @Column(STRING)
     public description: string;
+
+    @Unique(true)
+    @Column(STRING)
+    public name: string;
 
     @Column(STRING)
     public foreignServerSignUpChannel: string;
@@ -22,8 +22,8 @@ export default class Event extends BaseModel<Event>{
     @Column(STRING)
     public region: string;
 
-    @Column(BOOLEAN)
     @Default(false)
+    @Column(BOOLEAN)
     public disabled: boolean;
 
     @ForeignKey(() => Schedule)
