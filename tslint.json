@@ -8,12 +8,14 @@
         "max-line-length": {
             "options": [ 160 ]
         },
-        "semicolon": {
-            "severity": "warning"
-        },
+
+        //warning only
         "await-promise": {
             "severity": "warning"
-        }
+        },
+        //disabled checks
+        "ordered-imports": false,
+        "object-literal-sort-keys": false
     },
     "rulesDirectory": []
 }
