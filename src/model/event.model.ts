@@ -1,5 +1,5 @@
-import {Column, Default, HasMany, HasOne, Is, NotEmpty, Table, Unique, BeforeUpdate, AllowNull, BeforeValidate} from "sequelize-typescript";
-import {BOOLEAN, STRING} from "sequelize";
+import {AllowNull, BeforeValidate, Column, Default, HasMany, HasOne, Is, NotEmpty, Table, Unique} from "sequelize-typescript";
+import {STRING} from "sequelize";
 import Schedule from "./schedule.model";
 import Occurrence from "./occurrence.model";
 import BaseModel from "./model.base";
@@ -12,7 +12,7 @@ export default class Event extends BaseModel<Event> {
 
     @BeforeValidate
     public static lowerCaseRegionAttribute(instance: Event) {
-        if(instance.region) {
+        if (instance.region) {
             // @ts-ignore
             instance.region = instance.region.toUpperCase();
         }
