@@ -1,8 +1,9 @@
-import {CRUDRepository, Scope} from "./repository";
+import {CRUDRepository} from "./repository";
 import {IEventCreateDao, IEventSearchDao, IEventUpdateDao} from "../command/event.dao";
 import Schedule from "../model/schedule.model";
 import Occurrence from "../model/occurrence.model";
 import Event from "../model/event.model";
+import {Scope} from "../types/modelUtilTypes.type";
 
 export class EventRepository extends CRUDRepository<Event> {
 

@@ -1,11 +1,6 @@
 import BaseModel from "../model/model.base";
-import {Includeable} from "sequelize/types";
 import {IBasicSearchDao} from "../command/dao";
-
-export type Scope = Includeable[];
-export type NonAbstractTypeOfModel<T> = Constructor<T> & NonAbstract<typeof BaseModel>;
-type NonAbstract<T> = { [P in keyof T]: T[P] }; // "abstract" gets lost here
-type Constructor<T> = (new () => T);
+import {NonAbstractTypeOfModel, Scope} from "../types/modelUtilTypes.type";
 
 export class CRDRepository<Model extends BaseModel<Model>> {
 

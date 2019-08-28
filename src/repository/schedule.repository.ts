@@ -1,8 +1,9 @@
 import {Service} from "typedi";
 import Schedule from "../model/schedule.model";
-import {CRUDRepository, Scope} from "./repository";
+import {CRUDRepository} from "./repository";
 import {IScheduleCreateDao, IScheduleSearchDao, IScheduleUpdateDao} from "../command/schedule.dao";
 import NotificationText from "../model/notificationText.model";
+import {Scope} from "../types/modelUtilTypes.type";
 
 @Service()
 export class ScheduleRepository extends CRUDRepository<Schedule> {
