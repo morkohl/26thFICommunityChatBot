@@ -1,25 +1,15 @@
 import {path} from "app-root-path";
 import {config} from "dotenv";
+import {defaultDatabaseConfig, IDatabaseConfig} from "./db.config";
+import {defaultDiscordConfig, IDiscordConfig} from "./discord.config";
+import {DatabaseDialect} from "../types/databasedialect.type";
 
 export interface IConfig {
     databaseConfig: IDatabaseConfig;
+    discordConfig: IDiscordConfig;
 }
 
-export type DatabaseDialect = "postgres" | "sqlite" | "mssql" | "mysql";
-
-export type DatabaseLoggingOption = () => void | boolean;
-
-export interface IDatabaseConfig {
-    host: string | undefined;
-    port: number | undefined;
-    username: string;
-    password: string;
-    database: string;
-    dialect: DatabaseDialect;
-    logging: DatabaseLoggingOption;
-}
-
-export default function configure(): IConfig {
+export function configure(): IConfig {
     config({path: `${path}/.env${process.env.NODE_ENV === "PROD" ? "" : ".LOCAL"}`});
 
     return {
@@ -30,7 +20,12 @@ export default function configure(): IConfig {
             password: process.env.DB_PASSWORD || defaultConfig.databaseConfig.password,
             dialect: (process.env.DB_DIALECT || defaultConfig.databaseConfig.dialect) as DatabaseDialect,
             database: process.env.DB_DATABASE || defaultConfig.databaseConfig.database,
-            logging: (process.env.DB_LOGGING || defaultConfig.databaseConfig.logging) as DatabaseLoggingOption,
+        },
+        discordConfig: {
+            defaultPrefix: process.env.DISCORD_PREFIX || defaultConfig.discordConfig.defaultPrefix,
+            commandsDir: process.env.DISCORD_COMMANDS_DIR || defaultConfig.discordConfig.commandsDir,
+            owner: process.env.DISCORD_OWNER_ID || defaultConfig.discordConfig.owner,
+            token: process.env.DISCORD_AUTH_TOKEN,
         },
     };
 }
@@ -39,14 +34,7 @@ function parsePort(environmentVariable: string | undefined): number | undefined 
     return environmentVariable !== undefined ? parseInt(environmentVariable, 10) : undefined;
 }
 
-const defaultConfig: IConfig = {
-    databaseConfig: {
-        host: undefined,
-        port: undefined,
-        username: "root",
-        password: "",
-        dialect: "sqlite",
-        database: "admin",
-        logging: console.log,
-    },
+export const defaultConfig: IConfig = {
+    databaseConfig: defaultDatabaseConfig,
+    discordConfig: defaultDiscordConfig,
 };
