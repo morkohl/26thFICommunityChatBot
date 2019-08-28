@@ -1,4 +1,9 @@
 {
+    "linterOptions": {
+        "exclude": [
+            "test/**/*.test.ts"
+        ]
+    },
     "defaultSeverity": "error",
     "extends": [
         "tslint:recommended"
@@ -17,7 +22,7 @@
             "severity": "warning"
         },
 
-        //disabled checks
+        //disabled checks,
         "ordered-imports": false,
         "object-literal-sort-keys": false
     },
