@@ -2,13 +2,13 @@ import {Database} from "../../src/model/database";
 import {defaultDatabaseConfig} from "../../src/config/db.config";
 import Event from "../../src/model/event.model";
 import * as chai from "chai";
-import {Region} from "../../src/types/region.type";
+import {Region} from "../../src/util/types/region.type";
 import Occurrence from "../../src/model/occurrence.model";
-import Schedule from "../../src/model/schedule.model";
 import NotificationText from "../../src/model/notificationText.model";
 import {Op, UniqueConstraintError} from "sequelize";
 import {EventRepository} from "../../src/repository/event.repository";
-import {IEventCreateDao} from "../../src/command/event.dao";
+import {IEventUpdateDto} from "../../src/command/event.dto";
+import {Weekday} from "../../src/util/types/weekday.type";
 
 const expect = chai.expect;
 chai.use(require("chai-as-promised"));
@@ -51,6 +51,40 @@ describe("Event Repository", () => {
 
                 bddUtils.expectEventsEqual(actualEvent, expectedEvent);
             });
+
+            it("should find an Event given its eventStartHour", async () => {
+                const expectedEvent = await bddUtils.givenOneEvent();
+                const actualEvent = await testee.searchOne({eventStartHour: expectedEvent.eventStartHour});
+
+                bddUtils.expectEventsEqual(actualEvent, expectedEvent);
+            });
+
+            it("should find an Event given its eventStartMinute", async () => {
+                const expectedEvent = await bddUtils.givenOneEvent();
+                const actualEvent = await testee.searchOne({eventStartMinute: expectedEvent.eventStartMinute});
+
+                bddUtils.expectEventsEqual(actualEvent, expectedEvent);
+            });
+
+            it("should find an Event given its eventEndHour", async () => {
+                const expectedEvent = await bddUtils.givenOneEvent();
+                const actualEvent = await testee.searchOne({eventEndHour: expectedEvent.eventEndHour});
+
+                bddUtils.expectEventsEqual(actualEvent, expectedEvent);
+            });
+            it("should find an Event given its eventEndMinute", async () => {
+                const expectedEvent = await bddUtils.givenOneEvent();
+                const actualEvent = await testee.searchOne({eventEndMinute: expectedEvent.eventEndMinute});
+
+                bddUtils.expectEventsEqual(actualEvent, expectedEvent);
+            });
+
+            it("should find an Event given its weekday", async () => {
+                const expectedEvent = await bddUtils.givenOneEvent();
+                const actualEvent = await testee.searchOne({weekDay: expectedEvent.weekDay });
+
+                bddUtils.expectEventsEqual(actualEvent, expectedEvent);
+            });
         });
 
         describe("Searching multiple", () => {
@@ -63,18 +97,21 @@ describe("Event Repository", () => {
 
             it("should find all events for a region", async () => {
                 const expectedEvents = await bddUtils.givenManyEventsVariableRegion();
-                const actualEUEvents = await testee.search({
-                    region: "EU",
-                });
+                const actualEUEvents = await testee.search({ region: "EU" });
 
                 bddUtils.expectAllEventsAreValidComparedToExpectedEvents(actualEUEvents, expectedEvents.filter((event) => event.region === "EU"));
             });
 
+            it("should find all events for a weekday", async () => {
+                const expectedEvents = await bddUtils.givenManyEventsVariableRegion();
+                const actualEvents = await testee.search({ weekDay: "monday" });
+
+                bddUtils.expectAllEventsAreValidComparedToExpectedEvents(actualEvents, expectedEvents);
+            });
+
             it("should find all events that have a similar name to input given", async () => {
                 const expectedEvents = await bddUtils.givenManyEvents();
-                const actualEvents = await testee.search({
-                    name: {[Op.like]: "%event%"},
-                });
+                const actualEvents = await testee.search({ name: {[Op.like]: "%event%"} });
 
                 bddUtils.expectAllEventsAreValidComparedToExpectedEvents(actualEvents, expectedEvents);
             });
@@ -99,18 +136,27 @@ describe("Event Repository", () => {
     describe("Updating", () => {
         it("should update an event", async () => {
             const initialEvent = await bddUtils.givenOneEvent();
-            const slightlyDifferentDescription = "A slightly different description";
+            const updateDao: IEventUpdateDto = {
+                name: "Another event",
+                description: "just another ever",
+                region: "NA",
+                weekDay: "tuesday",
+                eventStartHour: 2,
+                eventStartMinute: 0,
+                eventEndHour: 3,
+                eventEndMinute: 0,
+                foreignServerSignUpChannel: "another channel",
+                memberSignUpChannel: "another channel",
+                numberOfNotifications: 3
+            };
 
             const updatedEvent = await testee.update({
                 name: initialEvent.name,
-            }, {
-                description: slightlyDifferentDescription,
-            });
+            }, updateDao);
 
             bddUtils.expectEventsEqual(updatedEvent, {
                 ...EventRepositoryBDDUtils.eventTemplate,
-                name: initialEvent.name,
-                description: slightlyDifferentDescription,
+                ...updateDao
             });
         });
 
@@ -127,7 +173,6 @@ describe("Event Repository", () => {
             return expect(testee.update({
                 name: anotherEvent.name,
             }, {
-                ...EventRepositoryBDDUtils.eventTemplate,
                 name: initialEvent.name,
             })).to.be.rejectedWith(UniqueConstraintError);
         });
@@ -144,7 +189,6 @@ describe("Event Repository", () => {
             const event = await bddUtils.givenOneEvent();
 
             return expect(testee.delete({name: event.name})).to.eventually.equal(1);
-
         });
 
         it("should delete multiple events based on their name", async () => {
@@ -160,10 +204,10 @@ describe("Event Repository", () => {
 
             await testee.delete({id: BigInt(event.id)});
 
-            const schedules = await Schedule.findAll();
+            const occurrences = await Occurrence.findAll();
             const notificationTexts = await NotificationText.findAll();
 
-            expect(schedules).to.be.empty;
+            expect(occurrences).to.be.empty;
             expect(notificationTexts).to.be.empty;
         });
     });
@@ -171,54 +215,43 @@ describe("Event Repository", () => {
 });
 
 export class EventRepositoryBDDUtils {
-    public static readonly eventTemplate: IEventCreateDao = {
+    public static readonly eventTemplate = {
         name: "Test Event",
         description: "A test event",
         foreignServerSignUpChannel: "https://discordapp.com/channels/some/1",
         memberSignUpChannel: "https://discordapp.com/channels/some/2",
         region: "EU" as Region,
-        schedule: {
-            weekDay: "monday",
-            eventStart: "7pm",
-            eventEnd: "8pm",
-            numberOfNotifications: 2,
-            notificationTexts: [
-                {
-                    text: "Some notification text",
-                },
-            ],
-        },
+        weekDay: "monday" as Weekday,
+        eventStartHour: 7,
+        eventStartMinute: 0,
+        eventEndHour: 8,
+        eventEndMinute: 0,
+        numberOfNotifications: 2,
+        notificationTexts: [
+            {
+                text: "Some notification text",
+            },
+        ],
     };
 
     public static readonly mockDatabaseEvent: any = {
+        ...EventRepositoryBDDUtils.eventTemplate,
         id: 1,
-        name: "Test Event",
-        description: "A test event",
-        foreignServerSignUpChannel: "https://discordapp.com/channels/some/1",
-        memberSignUpChannel: "https://discordapp.com/channels/some/2",
-        region: "EU" as Region,
         createdAt: new Date(),
         updatedAt: new Date(),
-        schedule: {
-            eventStart: "7pm",
-            eventEnd: "8pm",
-            eventId: 1,
-            weekDay: "monday",
-            numberOfNotifications: 2,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            notificationTexts: [
-                {
-                    text: "Some notification text",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-            ],
-        },
+        notificationTexts: [
+            ...EventRepositoryBDDUtils.eventTemplate.notificationTexts
+                .map((notificationText => {
+                    notificationText["createdAt"] = new Date();
+                    notificationText["updatedAt"] = new Date();
+                    return notificationText;
+                })),
+
+        ],
     };
 
     private currentNum = 0;
-    private scope = [Occurrence, {model: Schedule, include: [NotificationText]}];
+    private scope = [Occurrence, NotificationText];
 
     public async clear(): Promise<void> {
         await Event.truncate();
@@ -270,34 +303,31 @@ export class EventRepositoryBDDUtils {
     }
 
     public expectEventsEqual(actualEvent: any, expectedEvent: any): void | never {
-        expect(actualEvent).to.not.be.null;
+        expect(actualEvent).to.not.be.null.and.to.not.be.undefined;
+        expect(expectedEvent).to.not.be.null.and.to.not.be.undefined;
 
-        expect(actualEvent.id).to.be.at.least(0);
+        expect(Number(actualEvent.id)).to.be.at.least(0);
         expect(actualEvent.name).to.eq(expectedEvent.name);
         expect(actualEvent.description).to.eq(expectedEvent.description);
         expect(actualEvent.foreignServerSignUpChannel).to.eq(expectedEvent.foreignServerSignUpChannel);
         expect(actualEvent.memberSignUpChannel).to.eq(expectedEvent.memberSignUpChannel);
         expect(actualEvent.region).to.eq(expectedEvent.region);
+        expect(actualEvent.eventStartHour).to.eq(expectedEvent.eventStartHour);
+        expect(actualEvent.eventStartMinute).to.eq(expectedEvent.eventStartMinute);
+        expect(actualEvent.eventEndHour).to.eq(expectedEvent.eventEndHour);
+        expect(actualEvent.eventEndMinute).to.eq(expectedEvent.eventEndMinute);
+        expect(actualEvent.numberOfNotifications).to.eq(expectedEvent.numberOfNotifications);
         expect(actualEvent.createdAt).to.be.an.instanceof(Date);
         expect(actualEvent.updatedAt).to.be.an.instanceof(Date);
 
-        expect(actualEvent.schedule).to.not.be.undefined.and.to.not.eq(null);
-        expect(Number(actualEvent.schedule.id)).to.be.at.least(0);
-        expect(Number(actualEvent.schedule.eventId)).to.be.at.least(0);
-        expect(actualEvent.schedule.eventStart).to.eq(expectedEvent.schedule.eventStart);
-        expect(actualEvent.schedule.eventEnd).to.eq(expectedEvent.schedule.eventEnd);
-        expect(actualEvent.schedule.numberOfNotifications).to.eq(expectedEvent.schedule.numberOfNotifications);
-        expect(actualEvent.schedule.createdAt).to.be.an.instanceof(Date);
-        expect(actualEvent.schedule.updatedAt).to.be.an.instanceof(Date);
+        expect(actualEvent.notificationTexts.length).to.eq(expectedEvent.notificationTexts.length);
 
-        expect(actualEvent.schedule.notificationTexts.length).to.eq(expectedEvent.schedule.notificationTexts.length);
-
-        for (let i = 0; i < expectedEvent.schedule.notificationTexts.length; i++) {
-            expect(Number(actualEvent.schedule.notificationTexts[i].id)).to.be.at.least(0);
-            expect(Number(actualEvent.schedule.notificationTexts[i].scheduleId)).to.be.at.least(0);
-            expect(actualEvent.schedule.notificationTexts[i].text).to.eq(expectedEvent.schedule.notificationTexts[i].text);
-            expect(actualEvent.schedule.notificationTexts[i].createdAt).to.be.an.instanceof(Date);
-            expect(actualEvent.schedule.notificationTexts[i].updatedAt).to.be.an.instanceof(Date);
+        for (let i = 0; i < expectedEvent.notificationTexts.length; i++) {
+            expect(Number(actualEvent.notificationTexts[i].id)).to.be.at.least(0);
+            expect(Number(actualEvent.notificationTexts[i].eventId)).to.be.at.least(0);
+            expect(actualEvent.notificationTexts[i].text).to.eq(expectedEvent.notificationTexts[i].text);
+            expect(actualEvent.notificationTexts[i].createdAt).to.be.an.instanceof(Date);
+            expect(actualEvent.notificationTexts[i].updatedAt).to.be.an.instanceof(Date);
         }
 
         expect(actualEvent.occurrences).to.satisfy((occurrences) => occurrences === undefined || (occurrences !== null && occurrences.length === 0));

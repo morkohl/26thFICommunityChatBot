@@ -1,6 +1,6 @@
 import NotificationText from "../model/notificationText.model";
 import {CRDRepository} from "./repository";
-import {INotificationTextCreateDao, INotificationTextSearchDao} from "../command/notificationText.dao";
+import {INotificationTextCreateDto, INotificationTextSearchDto} from "../command/notificationText.dto";
 import {Service} from "typedi";
 
 @Service()
@@ -10,19 +10,19 @@ export class NotificationTextRepository extends CRDRepository<NotificationText> 
         super(NotificationText);
     }
 
-    public async search(dao: INotificationTextSearchDao): Promise<NotificationText[]> {
+    public async search(dao: INotificationTextSearchDto): Promise<NotificationText[]> {
         return super.search(dao);
     }
 
-    public async searchOne(dao: INotificationTextSearchDao): Promise<NotificationText | null> {
+    public async searchOne(dao: INotificationTextSearchDto): Promise<NotificationText | null> {
         return super.searchOne(dao);
     }
 
-    public async create(dao: INotificationTextCreateDao): Promise<NotificationText> {
+    public async create(dao: INotificationTextCreateDto): Promise<NotificationText> {
         return super.create(dao);
     }
 
-    public async delete(dao?: INotificationTextSearchDao): Promise<number> {
+    public async delete(dao?: INotificationTextSearchDto): Promise<number> {
         return super.delete(dao);
     }
 }

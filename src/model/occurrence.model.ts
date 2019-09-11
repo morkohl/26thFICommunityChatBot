@@ -16,6 +16,7 @@ export default class Occurrence extends BaseModel<Occurrence> {
     @BelongsTo(() => Event, {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
+        foreignKeyConstraint: true,
     })
     public readonly event: Event;
 

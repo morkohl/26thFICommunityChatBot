@@ -1,9 +1,9 @@
 import {CRUDRepository} from "./repository";
-import {IEventCreateDao, IEventSearchDao, IEventUpdateDao} from "../command/event.dao";
-import Schedule from "../model/schedule.model";
+import {IEventCreateDto, IEventSearchDto, IEventUpdateDto} from "../command/event.dto";
 import Occurrence from "../model/occurrence.model";
+import NotificationText from "../model/notificationText.model";
 import Event from "../model/event.model";
-import {Scope} from "../types/modelUtilTypes.type";
+import {Scope} from "../util/types/modelUtilTypes.type";
 
 export class EventRepository extends CRUDRepository<Event> {
 
@@ -11,28 +11,27 @@ export class EventRepository extends CRUDRepository<Event> {
         super(Event);
     }
 
-    public async create(dao: IEventCreateDao, scope?: Scope): Promise<Event> {
-        return super.create(dao, scope);
+    public async create(dto: IEventCreateDto, scope?: Scope): Promise<Event> {
+        return super.create(dto, scope);
     }
 
-    public async delete(dao?: IEventSearchDao): Promise<number> {
-        return super.delete(dao);
+    public async delete(dto?: IEventSearchDto): Promise<number> {
+        return super.delete(dto);
     }
 
-    public async search(dao: IEventSearchDao, scope?: Scope): Promise<Event[]> {
-        return super.search(dao, scope);
+    public async search(dto: IEventSearchDto, scope?: Scope): Promise<Event[]> {
+        return super.search(dto, scope);
     }
 
-    public async searchOne(dao: IEventSearchDao, scope?: Scope): Promise<Event | null> {
-        return super.searchOne(dao, scope);
+    public async searchOne(dto: IEventSearchDto, scope?: Scope): Promise<Event | null> {
+        return super.searchOne(dto, scope);
     }
 
-    public async update(searchDao: IEventSearchDao, updateDao: IEventUpdateDao, scope?: Scope): Promise<Event | null> {
-        delete updateDao.schedule;
-        return super.update(searchDao, updateDao);
+    public async update(searchDto: IEventSearchDto, updateDto: IEventUpdateDto, scope?: Scope): Promise<Event | null> {
+        return super.update(searchDto, updateDto);
     }
 
     public getDefaultScope(): Scope {
-        return [Occurrence, {model: Schedule, include: [{all: true}]}];
+        return [Occurrence, NotificationText];
     }
 }

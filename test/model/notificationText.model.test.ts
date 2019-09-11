@@ -23,7 +23,7 @@ describe("Notification Text Model", () => {
         it("should throw a validation error if any columns are null", () => {
             return expect(NotificationText.create()).to.be.rejectedWith(ValidationError,
                 "notNull Violation: NotificationText.text cannot be null,\n" +
-                "notNull Violation: NotificationText.scheduleId cannot be null");
+                "notNull Violation: NotificationText.eventId cannot be null");
         });
     });
 });

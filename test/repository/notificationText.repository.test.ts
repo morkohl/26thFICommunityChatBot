@@ -3,10 +3,9 @@ import {NotificationTextRepository} from "../../src/repository/notificationText.
 import {Database} from "../../src/model/database";
 import {defaultDatabaseConfig} from "../../src/config/db.config";
 import NotificationText from "../../src/model/notificationText.model";
-import {ScheduleRepositoryBDDUtils} from "./schedule.repository.test";
-import Schedule from "../../src/model/schedule.model";
 import Event from "../../src/model/event.model";
 import {UniqueConstraintError} from "sequelize"
+import {EventRepositoryBDDUtils} from "./event.repository.test";
 
 const expect = chai.expect;
 chai.use(require("chai-as-promised"));
@@ -39,12 +38,12 @@ describe("Notification Texts Repository", () => {
                 bddUtils.expectNotificationTextIsValid(actualNotificationText, expectedNotificationText);
             });
 
-            it("should find a notification text for given a schedule id", async () => {
-                const givenSchedule = await bddUtils.scheduleRepositoryBDDUtils.givenOneSchedule();
+            it("should find a notification text for given a eventId", async () => {
+                const givenEvent = await bddUtils.eventRepositoryBDDUtils.givenOneEvent();
 
-                const expectedNotificationText = givenSchedule.notificationTexts[0];
+                const expectedNotificationText = givenEvent.notificationTexts[0];
                 const actualNotificationText = await testee.searchOne({
-                    scheduleId: BigInt(givenSchedule.id),
+                    eventId: BigInt(givenEvent.id),
                 });
 
                 bddUtils.expectNotificationTextIsValid(actualNotificationText, expectedNotificationText);
@@ -60,11 +59,11 @@ describe("Notification Texts Repository", () => {
             });
 
             it("should find all notification texts for a given schedule id", async () => {
-                const givenSchedule = await bddUtils.scheduleRepositoryBDDUtils.givenOneSchedule();
+                const givenEvent = await bddUtils.eventRepositoryBDDUtils.givenOneEvent();
 
-                const expectedNotificationText = givenSchedule.notificationTexts[0];
+                const expectedNotificationText = givenEvent.notificationTexts[0];
                 const actualNotificationText = await testee.searchOne({
-                    scheduleId: BigInt(givenSchedule.id),
+                    eventId: BigInt(givenEvent.id),
                 });
 
                 bddUtils.expectNotificationTextsAreValid(actualNotificationText, expectedNotificationText);
@@ -75,25 +74,25 @@ describe("Notification Texts Repository", () => {
 
     describe("Creating Notification Texts", () => {
         it("should create a Notification Text", async () => {
-            const givenSchedule = await bddUtils.scheduleRepositoryBDDUtils.givenOneSchedule();
+            const givenEvent = await bddUtils.eventRepositoryBDDUtils.givenOneEvent();
             const text = "Some other text";
 
             const createdNotificationText = await testee.create({
                 text: text,
-                scheduleId: BigInt(givenSchedule.id)
+                eventId: BigInt(givenEvent.id)
             });
 
             bddUtils.expectNotificationTextIsValid(createdNotificationText, {
                 text: text,
-                scheduleId: givenSchedule.id
+                scheduleId: givenEvent.id
             });
         });
 
-        it("should enforce the unique constraint on the scheduleId and text columns", async () => {
-            const givenSchedule = await bddUtils.scheduleRepositoryBDDUtils.givenOneSchedule();
+        it("should enforce the unique constraint on the eventId and text columns", async () => {
+            const givenEvent = await bddUtils.eventRepositoryBDDUtils.givenOneEvent();
             const values = {
                 text: "Some other text",
-                scheduleId: BigInt(givenSchedule.id),
+                eventId: BigInt(givenEvent.id),
             };
 
             await testee.create(values);
@@ -118,37 +117,36 @@ describe("Notification Texts Repository", () => {
         it("should delete many notification texts based on their scheduleId", async () => {
             const givenNotificationTexts = await bddUtils.givenManyNotificationTexts();
 
-            return expect(testee.delete({ scheduleId: givenNotificationTexts[0].scheduleId})).to.eventually.equal(givenNotificationTexts.length);
+            return expect(testee.delete({ eventId: givenNotificationTexts[0].eventId})).to.eventually.equal(givenNotificationTexts.length);
         });
     });
 });
 
 class NotificationTextRepositoryBDDUtils {
-    public scheduleRepositoryBDDUtils = new ScheduleRepositoryBDDUtils();
+    public eventRepositoryBDDUtils = new EventRepositoryBDDUtils();
     private currentNum = 0;
 
-    public static notificationTextTemplate: any = ScheduleRepositoryBDDUtils.scheduleTemplate.notificationTexts[0];
+    public static notificationTextTemplate: any = EventRepositoryBDDUtils.eventTemplate.notificationTexts[0];
 
     public async clear() {
         this.currentNum = 0;
         await NotificationText.truncate();
-        await Schedule.truncate();
         return Event.truncate();
     }
 
     public async givenOneNotificationText(): Promise<NotificationText> {
-        const schedule: Schedule = await this.scheduleRepositoryBDDUtils.givenOneSchedule();
-        return schedule.notificationTexts[0];
+        const event: Event = await this.eventRepositoryBDDUtils.givenOneEvent();
+        return event.notificationTexts[0];
     }
 
     public async givenManyNotificationTexts(amount: number = 5) {
-        const schedule: Schedule = await this.scheduleRepositoryBDDUtils.givenOneSchedule();
-        const notificationTexts: NotificationText[] = [schedule.notificationTexts[0]];
+        const event: Event = await this.eventRepositoryBDDUtils.givenOneEvent();
+        const notificationTexts: NotificationText[] = [event.notificationTexts[0]];
 
         for (let i = 0; i < amount - 1; i++) {
             notificationTexts.push(await NotificationText.create({
                 text: `${NotificationTextRepositoryBDDUtils.notificationTextTemplate.text} Nr. ${this.incrementor()}`,
-                scheduleId: schedule.id
+                eventId: event.id
             }));
         }
 
@@ -165,7 +163,7 @@ class NotificationTextRepositoryBDDUtils {
 
     public expectNotificationTextIsValid(actualNotificationText: any, expectedNotificationText: any) {
         expect(Number(actualNotificationText.id)).to.be.at.least(0);
-        expect(Number(actualNotificationText.scheduleId)).to.be.at.least(0);
+        expect(Number(actualNotificationText.eventId)).to.be.at.least(0);
         expect(actualNotificationText.text).to.eq(expectedNotificationText.text);
         expect(actualNotificationText.createdAt).to.be.an.instanceof(Date);
         expect(actualNotificationText.updatedAt).to.be.an.instanceof(Date);

@@ -1,7 +1,7 @@
-import {Table, BelongsTo, ForeignKey, Column, TableOptions, AllowNull} from "sequelize-typescript";
-import {STRING, BIGINT} from "sequelize";
+import {AllowNull, BelongsTo, Column, ForeignKey, Table} from "sequelize-typescript";
+import {BIGINT} from "sequelize";
 import BaseModel from "./model.base";
-import Schedule from "./schedule.model";
+import Event from "./event.model";
 
 @Table({
     tableName: "notificationtexts",
@@ -9,7 +9,7 @@ import Schedule from "./schedule.model";
         {
             name: "unique_text_per_event_index",
             fields: [
-                "scheduleId",
+                "eventId",
                 "text",
             ],
             unique: true,
@@ -22,14 +22,14 @@ export default class NotificationText extends BaseModel<NotificationText> {
     public text: string;
 
     @AllowNull(false)
-    @ForeignKey(() => Schedule)
+    @ForeignKey(() => Event)
     @Column(BIGINT)
-    public scheduleId: bigint;
+    public eventId: bigint;
 
-    @BelongsTo(() => Schedule, {
+    @BelongsTo(() => Event, {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
         foreignKeyConstraint: true,
     })
-    public schedule: Schedule;
+    public event: Event;
 }

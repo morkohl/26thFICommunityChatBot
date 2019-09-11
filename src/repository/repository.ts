@@ -1,6 +1,6 @@
 import BaseModel from "../model/model.base";
-import {IBasicSearchDao} from "../command/dao";
-import {NonAbstractTypeOfModel, Scope} from "../types/modelUtilTypes.type";
+import {IBasicSearchDto} from "../command/dto";
+import {NonAbstractTypeOfModel, Scope} from "../util/types/modelUtilTypes.type";
 
 export class CRDRepository<Model extends BaseModel<Model>> {
 
@@ -15,7 +15,7 @@ export class CRDRepository<Model extends BaseModel<Model>> {
      * @param scope the provided scope (defualts to #getDefaultScope)
      * @returns the models found
      */
-    public async search(dao: any & IBasicSearchDao, scope?: Scope): Promise<Model[]> {
+    public async search(dao: any & IBasicSearchDto, scope?: Scope): Promise<Model[]> {
         return await this.model.findAll({
             where: dao,
             include: !!scope ? scope : this.getDefaultScope(),
@@ -29,7 +29,7 @@ export class CRDRepository<Model extends BaseModel<Model>> {
      * @param scope the provided scope (defaults to #getDefaultScope)
      * @returns the model if found, else null
      */
-    public async searchOne(dao: any & IBasicSearchDao, scope?: Scope): Promise<Model | null> {
+    public async searchOne(dao: any & IBasicSearchDto, scope?: Scope): Promise<Model | null> {
         return await this.model.findOne({
             where: dao,
             include: !!scope ? scope : this.getDefaultScope(),
@@ -80,7 +80,7 @@ export class CRUDRepository<Model extends BaseModel<Model>> extends CRDRepositor
      * @param scope the scope to update with
      * @returns the updated instance if it was found
      */
-    public async update(searchDao: any & IBasicSearchDao, updateDao: any, scope?: Scope): Promise<Model | null> {
+    public async update(searchDao: any & IBasicSearchDto, updateDao: any, scope?: Scope): Promise<Model | null> {
         const model: Model | null = await this.model.findOne({
             where: searchDao,
             include: !!scope ? scope : this.getDefaultScope(),
