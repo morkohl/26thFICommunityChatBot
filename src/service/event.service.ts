@@ -2,7 +2,7 @@ import Event from "../model/event.model";
 import {EventRepository} from "../repository/event.repository";
 import {Inject, Service} from "typedi";
 import {IEventCreateDto, IEventSearchDto, IEventUpdateDto} from "../command/event.dto";
-import {EventScheduler} from "../scheduler/Scheduler";
+import {EventScheduler} from "../scheduler/scheduler";
 import {CronJob} from "cron";
 
 @Service()
