@@ -1,4 +1,4 @@
-import {DatabaseDialect} from "../types/databasedialect.type";
+import {DatabaseDialect} from "../util/types/databasedialect.type";
 
 export interface IDatabaseConfig {
     readonly host: string | undefined;

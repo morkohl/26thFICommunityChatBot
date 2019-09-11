@@ -2,7 +2,7 @@ import {path} from "app-root-path";
 import {config} from "dotenv";
 import {defaultDatabaseConfig, IDatabaseConfig} from "./db.config";
 import {defaultDiscordConfig, IDiscordConfig} from "./discord.config";
-import {DatabaseDialect} from "../types/databasedialect.type";
+import {DatabaseDialect} from "../util/types/databasedialect.type";
 
 export interface IConfig {
     databaseConfig: IDatabaseConfig;
