@@ -1,10 +1,10 @@
-import {IDatabaseConfig} from "../config/db.config";
+import {defaultDatabaseConfig, IDatabaseConfig} from "../config/db.config";
 import {Sequelize} from "sequelize-typescript";
 
 export class Database {
     public sequelize: Sequelize;
 
-    constructor(private databaseConfig: IDatabaseConfig) {
+    constructor(private databaseConfig: IDatabaseConfig = defaultDatabaseConfig) {
     }
 
     public async connect(): Promise<void> {
