@@ -66,35 +66,35 @@ export default class Event extends BaseModel<Event> {
 
     @AllowNull(false)
     @IsInt
-    @Min(0)
-    @Max(23)
+    @Min(Constants.Cron.Hour.Max)
+    @Max(Constants.Cron.Hour.Max)
     @Column
     public eventStartHour: number;
 
     @AllowNull(false)
     @IsInt
-    @Min(0)
-    @Max(59)
+    @Min(Constants.Cron.Minute.Max)
+    @Max(Constants.Cron.Minute.Max)
     @Column
     public eventStartMinute: number;
 
     @AllowNull(false)
     @IsInt
-    @Min(0)
-    @Max(23)
+    @Min(Constants.Cron.Hour.Max)
+    @Max(Constants.Cron.Hour.Max)
     @Column
     public eventEndHour: number;
 
     @AllowNull(false)
     @IsInt
-    @Min(0)
-    @Max(59)
+    @Min(Constants.Cron.Minute.Max)
+    @Max(Constants.Cron.Minute.Max)
     @Column
     public eventEndMinute: number;
 
     @IsInt
-    @Min(1)
     @Max(5)
+    @Min(1)
     @Default(2)
     @Column
     public numberOfNotifications: number;
@@ -117,7 +117,7 @@ export default class Event extends BaseModel<Event> {
         const minute = this.eventStartMinute;
 
         const rest = (hour + 1) - numberOfNotifications;
-        const maxHour = Constants.Cron.Hour.max;
+        const maxHour = Constants.Cron.Hour.Max;
         const dayOfWeek = Constants.Cron.WeekDays[this.weekDay];
 
         if (rest < 0) {

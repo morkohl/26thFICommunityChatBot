@@ -153,7 +153,7 @@ describe("Event Model", () => {
                 ...eventValues,
                 numberOfNotifications: 6,
             })).to.be.rejectedWith(ValidationError,
-                "Validation max on numberOfNotifications failed");
+                "Validation Max on numberOfNotifications failed");
         });
 
         it("should throw a validation error if the numberOfNotifications provided is below the minimum", () => {
@@ -161,7 +161,7 @@ describe("Event Model", () => {
                 ...eventValues,
                 numberOfNotifications: 0,
             })).to.be.rejectedWith(ValidationError,
-                "Validation min on numberOfNotifications failed");
+                "Validation Min on numberOfNotifications failed");
         });
     });
 
