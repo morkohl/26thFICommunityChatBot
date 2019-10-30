@@ -32,7 +32,7 @@
     "pg": "^7.11.0",
     "moment-timezone": "^0.5.26",
     "prom-client": "^11.5.3",
-    "sequelize": "^5.8.7",
+    "sequelize": "^5.15.1",
     "sqlite3": "^4.1.0",
     "typedi": "^0.8.0"
   },
