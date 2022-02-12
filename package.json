@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/morkohl/26thFICommunityChatBot#readme",
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "app-root-path": "^2.2.1",
     "cron": "^1.7.1",
     "cronstrue": "^1.82.0",
