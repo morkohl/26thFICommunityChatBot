@@ -30,7 +30,7 @@
     "discord.js": "^11.5.1",
     "dotenv": "^7.0.0",
     "pg": "^7.11.0",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "prom-client": "^11.5.3",
     "sequelize": "^5.15.1",
     "sqlite3": "^4.1.0",
