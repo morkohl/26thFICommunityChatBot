@@ -52,7 +52,7 @@
     "chai-json-schema": "^1.5.1",
     "chai-as-promised": "^7.1.1",
     "envsub": "^3.0.9",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "nodemon": "^1.18.10",
     "nyc": "^14.1.1",
     "reflect-metadata": "^0.1.13",
